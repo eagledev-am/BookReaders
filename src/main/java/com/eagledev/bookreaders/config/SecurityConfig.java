@@ -19,6 +19,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
@@ -27,56 +28,53 @@ import org.springframework.security.web.SecurityFilterChain;
 public class SecurityConfig {
 
     private final UserRepo repo;
+    private final JwtAuthFilter authFilter;
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http){
-            http.csrf(AbstractHttpConfigurer::disable)
-                    .authorizeHttpRequests(
-                     config -> config.requestMatchers(
-                             "/api/auth/**" ,
-                              "/api-docs/**"  ,
-                              "/swagger-ui/**"
-                     )
-                             .permitAll()
-                             .anyRequest()
-                             .permitAll()
-                    )
-                    .sessionManagement(sessionConfig ->
-                            sessionConfig.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                    .authenticationProvider(authenticationProvider())
-                    .logout(
-                            httpSecurityLogoutConfigurer -> httpSecurityLogoutConfigurer.logoutUrl("/api/logout")
-                                    .clearAuthentication(true)
-                                    .invalidateHttpSession(true)
-                                    .logoutSuccessHandler((req,res,auth) -> SecurityContextHolder.clearContext())
-                    );
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        http
+                .csrf(AbstractHttpConfigurer::disable)
+                .authorizeHttpRequests(req -> req
+                        .requestMatchers(
+                                "/api/auth/**",
+                                "/api-docs/**",
+                                "/swagger-ui/**",
+                                "/swagger-ui.html"
+                        ).permitAll()
+                        .anyRequest().permitAll()
+                )
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authenticationProvider(authenticationProvider())
+                .addFilterBefore(authFilter, UsernamePasswordAuthenticationFilter.class)
+                .logout(logout -> logout
+                        .logoutUrl("/api/auth/logout")
+                        .logoutSuccessHandler((request, response, authentication) ->
+                                SecurityContextHolder.clearContext())
+                );
 
-            return http.build();
-    }
-
-
-    @Bean
-    AuthenticationProvider authenticationProvider(){
-        DaoAuthenticationProvider daoProvider = new DaoAuthenticationProvider(userDetailsService());
-        daoProvider.setPasswordEncoder(passwordEncoder());
-        return daoProvider;
+        return http.build();
     }
 
     @Bean
-    PasswordEncoder passwordEncoder(){
+    public AuthenticationProvider authenticationProvider() {
+        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider(userDetailsService());
+        authProvider.setPasswordEncoder(passwordEncoder());
+        return authProvider;
+    }
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
     @Bean
-    UserDetailsService userDetailsService(){
-        return email -> {
-            return repo.findUserByEmail(email).orElseThrow(() -> new UsernameNotFoundException("message : user not found!"));
-        };
+    public UserDetailsService userDetailsService() {
+        return email -> repo.findUserByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
     }
 
     @Bean
-    AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration){
-        return authenticationConfiguration.getAuthenticationManager();
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+        return config.getAuthenticationManager();
     }
-
 }
