@@ -27,8 +27,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-    private final UserRepo repo;
     private final JwtAuthFilter authFilter;
+    private final AuthenticationProvider authenticationProvider;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -44,7 +44,7 @@ public class SecurityConfig {
                         .anyRequest().permitAll()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authenticationProvider(authenticationProvider())
+                .authenticationProvider(authenticationProvider)
                 .addFilterBefore(authFilter, UsernamePasswordAuthenticationFilter.class)
                 .logout(logout -> logout
                         .logoutUrl("/api/auth/logout")
@@ -55,26 +55,4 @@ public class SecurityConfig {
         return http.build();
     }
 
-    @Bean
-    public AuthenticationProvider authenticationProvider() {
-        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider(userDetailsService());
-        authProvider.setPasswordEncoder(passwordEncoder());
-        return authProvider;
-    }
-
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
-
-    @Bean
-    public UserDetailsService userDetailsService() {
-        return email -> repo.findUserByEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
-    }
-
-    @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
-        return config.getAuthenticationManager();
-    }
 }
