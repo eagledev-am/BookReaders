@@ -3,15 +3,19 @@ package com.eagledev.bookreaders.entities;
 
 import com.eagledev.bookreaders.entities.enums.ContactType;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Setter
+@Getter
 @Entity
-@Table
+@Table(
+        uniqueConstraints = {
+                @UniqueConstraint(columnNames = {"user_id" , "contact_type"})
+        }
+)
 public class UserContact {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id

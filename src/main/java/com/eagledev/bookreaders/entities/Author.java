@@ -1,16 +1,18 @@
 package com.eagledev.bookreaders.entities;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import org.hibernate.annotations.UuidGenerator;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.UUID;
 
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Getter
+@Setter
 @Entity
 @Table
 public class Author {
@@ -18,6 +20,10 @@ public class Author {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
     private int id;
+
+    @Column(updatable = false,unique = true)
+    @UuidGenerator(style = UuidGenerator.Style.RANDOM)
+    private UUID uuid;
 
     @Column(nullable = false)
     private String name;
