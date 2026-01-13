@@ -45,6 +45,9 @@ public class SecurityConfig {
                                 "/api/v1/file/**"
                         ).permitAll()
                         .requestMatchers(HttpMethod.GET,"/api/v1/u/**").permitAll()
+                        .requestMatchers(HttpMethod.GET,"/api/v1/categories/**").permitAll()
+                        .requestMatchers(HttpMethod.GET,"/api/v1/authors/**").permitAll()
+                        .requestMatchers(HttpMethod.GET,"/api/v1/books/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
