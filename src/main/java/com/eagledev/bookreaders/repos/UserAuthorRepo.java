@@ -10,4 +10,6 @@ import java.util.UUID;
 public interface UserAuthorRepo extends JpaRepository<UserAuthor,Integer> {
     boolean existsByUserAndAuthor(User user , Author author);
     void deleteByUserAndAuthor(User user, Author author);
+    void deleteByAuthorId(int id);
+
 }
