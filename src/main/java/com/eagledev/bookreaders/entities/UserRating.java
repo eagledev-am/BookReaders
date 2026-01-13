@@ -4,12 +4,14 @@ package com.eagledev.bookreaders.entities;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
+@Getter
 @Table(
         name = "user_book_rating" , uniqueConstraints = {
         @UniqueConstraint(

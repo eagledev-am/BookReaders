@@ -1,9 +1,8 @@
 package com.eagledev.bookreaders.entities;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.UuidGenerator;
 
 import java.math.BigDecimal;
@@ -14,6 +13,8 @@ import java.util.UUID;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Getter
+@Setter
 @Entity
 @Table
 public class Book{
@@ -41,13 +42,19 @@ public class Book{
 
     private LocalDate publishDate;
 
-    private String ebookContentUrl;
+    private String ebookCoverUrl;
+
+    private boolean deleted = false;
+
+    @Column(name = "deleted_at")
+    private LocalDate deletedAt;
 
     @ManyToMany
     @JoinTable(
             name = "authors_books" ,
             joinColumns = @JoinColumn(name = "book_id") ,
-            inverseJoinColumns = @JoinColumn(name = "author_id")
+            inverseJoinColumns = @JoinColumn(name = "author_id"),
+            uniqueConstraints = @UniqueConstraint(columnNames = {"book_id", "author_id"})
     )
     private List<Author> authors;
 
@@ -58,10 +65,21 @@ public class Book{
     @JoinTable(
             name = "book_category",
             joinColumns = @JoinColumn(name = "book_id"),
-            inverseJoinColumns = @JoinColumn(name = "category_id")
+            inverseJoinColumns = @JoinColumn(name = "category_id"),
+            uniqueConstraints = @UniqueConstraint(columnNames = {"book_id", "category_id"})
     )
     private List<Category> categories;
 
-    @OneToOne(mappedBy = "book", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToOne(mappedBy = "book",cascade = CascadeType.ALL,optional = true)
     private DiscussionRoom discussionRoom;
+
+    public void setAuthors(List<Author> authors) {
+        this.authors.clear();
+        this.authors.addAll(authors);
+    }
+
+    public void setCategories(List<Category> categories) {
+        this.categories.clear();
+        this.categories.addAll(categories);
+    }
 }
