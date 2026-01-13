@@ -27,7 +27,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
@@ -126,13 +125,13 @@ public class UserServiceImp implements UserService{
             try {
                 String url = user.getPhotoUrl();
                 String fileName = url.substring(url.lastIndexOf("/") + 1);
-                fileStorageService.deleteFile(FileStorageService.AVATAR_URL, fileName);
+                fileStorageService.deleteFile(FileStorageService.AVATAR, fileName);
             } catch (Exception e) {
                 log.error("Warning: Could not delete old avatar: " + e.getMessage());
             }
         }
 
-        String filePath = fileStorageService.uploadFile(FileStorageService.AVATAR_URL,file);
+        String filePath = fileStorageService.uploadFile(FileStorageService.AVATAR,file);
 
         user.setPhotoUrl(filePath);
         userRepo.save(user);

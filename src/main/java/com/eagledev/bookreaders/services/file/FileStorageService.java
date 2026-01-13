@@ -10,7 +10,6 @@ import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -36,7 +35,9 @@ public class FileStorageService {
 
     private Path rootLocation;
 
-    public static final String AVATAR_URL="AVATAR_URL";
+    public static final String AVATAR ="avatar";
+    public static final String AUTHOR="author";
+    public static final String BOOK="book";
     public static final List<String> ALLOWED_IMAGE_TYPES = Arrays.asList("image/jpeg", "image/png", "image/jpg");
 
     @PostConstruct
