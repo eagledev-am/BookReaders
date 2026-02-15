@@ -22,4 +22,5 @@ public interface BookService {
     void restoreBook(UUID bookId) throws BadRequestException;
     void hardDeleteBook(UUID bookId);
     void updateBookPhoto(UUID uuid , MultipartFile photo) throws BadRequestException;
+    boolean isExistedByUuid(UUID uuid);
 }

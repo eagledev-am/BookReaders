@@ -1,9 +1,8 @@
 package com.eagledev.bookreaders.entities;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.NoArgsConstructor;
+import lombok.*;
+
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UuidGenerator;
 
@@ -15,6 +14,8 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Getter
+@Setter
 @Table
 public class Comment {
 
@@ -33,6 +34,8 @@ public class Comment {
     @Column(updatable = false)
     private LocalDate createdAt;
 
+    private int replyCount;
+
     @ManyToOne
     @JoinColumn(name = "post_id")
     private Post post;
@@ -45,7 +48,7 @@ public class Comment {
     @JoinColumn(name = "parent_id")
     private Comment parent;
 
-    @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL,fetch = FetchType.EAGER)
     private List<Comment> replies;
 }
 

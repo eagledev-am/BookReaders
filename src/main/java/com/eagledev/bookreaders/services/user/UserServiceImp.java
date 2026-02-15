@@ -50,6 +50,14 @@ public class UserServiceImp implements UserService{
         return userMapper.toProfile(user);
     }
 
+    @Override
+    public User getUserById(UUID id){
+        return userRepo.findUserByUuid(id).orElseThrow(
+                () -> new ResourceNotFoundException("User","id", id)
+        );
+    }
+
+
     @Transactional
     @Override
     public UserProfileResponse updateUserProfile(UUID id, UserProfileRequest profileRequest) {
@@ -170,9 +178,4 @@ public class UserServiceImp implements UserService{
                 .toList();
     }
 
-    private User getUserById(UUID id){
-        return userRepo.findUserByUuid(id).orElseThrow(
-                () -> new ResourceNotFoundException("User","id", id)
-        );
-    }
 }

@@ -211,6 +211,11 @@ public class BookServiceImp implements BookService{
         bookRepo.save(book);
     }
 
+    @Override
+    public boolean isExistedByUuid(UUID uuid) {
+        return bookRepo.existsByUuid(uuid);
+    }
+
     private List<Author> getAuthors(List<UUID> authorIds){
         return authorIds.stream()
                 .map(authorService::getAuthorById)

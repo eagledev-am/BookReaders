@@ -37,3 +37,6 @@ build/
 ###
 ./uploads
 uploads
+
+model_changes.md
+social-domain.http

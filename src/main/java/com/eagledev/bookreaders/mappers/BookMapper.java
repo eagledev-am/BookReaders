@@ -45,25 +45,6 @@ public interface BookMapper {
                 .collect(Collectors.toList());
     }
 
-//    @Named("authorsToAuthorResponses")
-//    default List<AuthorBookResponse> authorsToAuthorResponses(List<Author> authors) {
-//        if (authors == null || authors.isEmpty()) {
-//            return List.of();
-//        }
-//        System.out.println(authors.get(0).getName());
-//        return authors.stream()
-//                .map(
-//                        author -> {
-//                            return AuthorBookResponse.builder()
-//                                    .name(author.getName())
-//                                    .photoUrl(author.getPhotoUrl())
-//                                    .uuid(author.getUuid())
-//                                    .build();
-//                        }
-//                )
-//                .collect(Collectors.toList());
-//    }
-
 
     @Named("calculateAverageRating")
     default Double calculateAverageRating(List<UserRating> ratings) {

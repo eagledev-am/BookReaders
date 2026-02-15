@@ -22,7 +22,6 @@ import org.springframework.context.annotation.Configuration;
                         "**Key Features:**\n" +
                         "- **Public:** Browse catalog, read reviews.\n" +
                         "- **User:** Manage profile, post, comment, like, follow authors.\n" +
-                        "- **Premium:** Access E-Reader content.\n" +
                         "- **Admin:** CMS for Books/Authors.\n\n" +
                         "**Authentication:**\n" +
                         "This API uses JWT (JSON Web Tokens). Please log in via `/api/v1/auth/login` " +

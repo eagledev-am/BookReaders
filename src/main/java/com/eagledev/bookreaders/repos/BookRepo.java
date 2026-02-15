@@ -45,4 +45,6 @@ public interface BookRepo extends JpaRepository<Book,Integer> {
         LOWER(c.tag)         LIKE LOWER(CONCAT('%', :query, '%'))
     """)
     Page<Book> searchUnDeletedBooks(@Param("query") String query, Pageable pageable);
+
+    boolean existsByUuid(UUID uuid);
 }

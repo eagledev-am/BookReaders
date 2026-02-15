@@ -1,11 +1,10 @@
 package com.eagledev.bookreaders.entities;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UuidGenerator;
+import org.springframework.data.annotation.LastModifiedDate;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -14,6 +13,8 @@ import java.util.UUID;
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
+@Getter
+@Setter
 @Builder
 @Table
 public class Post {
@@ -36,7 +37,12 @@ public class Post {
     @Column(updatable = false)
     private LocalDate createdAt;
 
+    @LastModifiedDate
+    private LocalDate updatedAt;
+
     private int likeCount = 0;
+
+    private int commentCount = 0;
 
     @ManyToOne
     @JoinColumn(name = "room_id")
@@ -46,9 +52,9 @@ public class Post {
     @JoinColumn(name = "user_id")
     private User user;
 
-    @OneToMany(fetch = FetchType.LAZY,mappedBy = "post")
+    @OneToMany(fetch = FetchType.LAZY,mappedBy = "post",cascade = CascadeType.REMOVE,orphanRemoval = true)
     private List<Comment> comments;
 
-    @OneToMany(fetch = FetchType.LAZY,mappedBy = "post")
+    @OneToMany(fetch = FetchType.LAZY,mappedBy = "post",cascade = CascadeType.REMOVE,orphanRemoval = true)
     private List<PostLike> likes;
 }
