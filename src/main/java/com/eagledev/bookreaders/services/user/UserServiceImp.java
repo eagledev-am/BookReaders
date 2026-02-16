@@ -1,20 +1,20 @@
 package com.eagledev.bookreaders.services.user;
 
 import com.eagledev.bookreaders.dtos.author.AuthorResponse;
+import com.eagledev.bookreaders.dtos.book.BookResponse;
 import com.eagledev.bookreaders.dtos.user.ChangePasswordRequest;
 import com.eagledev.bookreaders.dtos.user.UserContactDto;
 import com.eagledev.bookreaders.dtos.user.UserProfileRequest;
 import com.eagledev.bookreaders.dtos.user.UserProfileResponse;
-import com.eagledev.bookreaders.entities.Author;
-import com.eagledev.bookreaders.entities.User;
-import com.eagledev.bookreaders.entities.UserAuthor;
-import com.eagledev.bookreaders.entities.UserContact;
+import com.eagledev.bookreaders.entities.*;
 import com.eagledev.bookreaders.entities.enums.ContactType;
 import com.eagledev.bookreaders.exceptions.ResourceNotFoundException;
 import com.eagledev.bookreaders.mappers.AuthorMapper;
+import com.eagledev.bookreaders.mappers.BookMapper;
 import com.eagledev.bookreaders.mappers.UserMapper;
 import com.eagledev.bookreaders.repos.UserAuthorRepo;
 import com.eagledev.bookreaders.repos.UserContactRepo;
+import com.eagledev.bookreaders.repos.UserReadingProgressRepo;
 import com.eagledev.bookreaders.repos.UserRepo;
 import com.eagledev.bookreaders.services.author.AuthorService;
 import com.eagledev.bookreaders.services.file.FileStorageService;
@@ -42,6 +42,8 @@ public class UserServiceImp implements UserService{
     private final AuthorService authorService;
     private final UserContactRepo userContactRepo;
     private final AuthorMapper authorMapper;
+    private final UserReadingProgressRepo readingProgressRepo;
+    private final BookMapper bookMapper;
     private final FileStorageService fileStorageService;
 
     @Override
@@ -175,6 +177,15 @@ public class UserServiceImp implements UserService{
         return user.getFollowingAuthor()
                 .stream()
                 .map(authorMapper::userAuthorToAuthorResponse)
+                .toList();
+    }
+
+    @Override
+    public List<BookResponse> getReadBooks(UUID userId) {
+        User user = getUserById(userId);
+        List<Book> books = readingProgressRepo.findByUserId(user.getId());
+        return books.stream()
+                .map(bookMapper::bookToBookResponse)
                 .toList();
     }
 

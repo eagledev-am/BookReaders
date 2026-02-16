@@ -2,9 +2,8 @@ package com.eagledev.bookreaders.entities;
 
 import com.eagledev.bookreaders.entities.enums.ReadingStatus;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.NoArgsConstructor;
+import lombok.*;
+
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
@@ -12,6 +11,8 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Getter
+@Setter
 @Entity
 @Table(
         name = "user_reading_book_progress" , uniqueConstraints = {
@@ -29,8 +30,8 @@ public class UserReadingProgress {
 
     @Enumerated(EnumType.STRING)
     private ReadingStatus status;
-    private int currentPage; // e.g. Page 54
-    private int totalPages;  // Copied from Book entity for percentage calc
+    private int currentPage;
+    private int totalPages;
 
     @UpdateTimestamp
     private LocalDateTime lastReadAt;

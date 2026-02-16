@@ -115,6 +115,15 @@ public class UserController {
         );
     }
 
+    @Operation(summary = "Get list of reading books")
+    @GetMapping("/me/books")
+    public ResponseEntity<ApiResponse<List<?>>> getReadingBooks(Authentication auth) {
+        List<?> books = userService.getReadBooks(getUserId(auth));
+        return ResponseEntity.ok(
+                ApiResponseBuilder.success("Reading Books retrieved successfully", books)
+        );
+    }
+
     @Operation(summary = "Add a social contact link")
     @PostMapping("/me/contacts")
     public ResponseEntity<ApiResponse<List<UserContactDto>>> addContact(

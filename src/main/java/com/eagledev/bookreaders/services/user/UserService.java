@@ -1,5 +1,6 @@
 package com.eagledev.bookreaders.services.user;
 
+import com.eagledev.bookreaders.dtos.book.BookResponse;
 import com.eagledev.bookreaders.entities.User;
 import org.apache.coyote.BadRequestException;
 import org.springframework.web.multipart.MultipartFile;
@@ -22,4 +23,5 @@ public interface UserService {
     String uploadProfilePhoto(UUID userId, MultipartFile file) throws BadRequestException;
     List<UserContactDto> addContact(UUID userId, UserContactDto contactDto);
     List<AuthorResponse> getFollowedAuthors(UUID userId);
+    List<BookResponse> getReadBooks(UUID userId);
 }
