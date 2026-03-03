@@ -4,6 +4,7 @@ import com.eagledev.bookreaders.dtos.api.ApiResponse;
 import com.eagledev.bookreaders.dtos.api.ApiResponseBuilder;
 import com.eagledev.bookreaders.exceptions.auth.AccountNotVerifiedException;
 import com.eagledev.bookreaders.exceptions.auth.InvalidVerificationCodeException;
+import com.eagledev.bookreaders.exceptions.auth.UnauthorizedException;
 import com.eagledev.bookreaders.exceptions.auth.UserAlreadyExistsException;
 import org.apache.coyote.BadRequestException;
 import org.springframework.http.HttpStatus;
@@ -59,6 +60,12 @@ public class HandlingException {
     @ExceptionHandler(AuthorizationDeniedException.class)
     public ResponseEntity<ApiResponse<Object>> authorizationDeniedException(AuthorizationDeniedException ex) {
         return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body(ApiResponseBuilder.error(ex.getMessage()));
+    }
+
+    @ExceptionHandler(UnauthorizedException.class)
+    public ResponseEntity<ApiResponse<Object>> handleUnauthorized(UnauthorizedException ex) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                 .body(ApiResponseBuilder.error(ex.getMessage()));
     }
 
