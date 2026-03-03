@@ -4,6 +4,8 @@ target/
 !**/src/main/**/target/
 !**/src/test/**/target/
 .env
+env.properties
+
 
 ### STS ###
 .apt_generated
@@ -37,6 +39,7 @@ build/
 ###
 ./uploads
 uploads
+.mds
 
 model_changes.md
 social-domain.http
