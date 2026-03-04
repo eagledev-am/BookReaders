@@ -488,14 +488,6 @@ All endpoints return a standardized response:
   "timestamp": "2026-02-23T10:30:00"
 }
 ```
-
----
-
-
-##  License
-
-This project is currently unlicensed. Please contact the project maintainers for licensing information.
-
 ---
 
 ## Authors
@@ -503,6 +495,4 @@ This project is currently unlicensed. Please contact the project maintainers for
 Developed by the [EagleDev](mailto:magdyabdo484@gmail.com) team.
 
 ---
-
-**Happy Reading! 📚**
 
