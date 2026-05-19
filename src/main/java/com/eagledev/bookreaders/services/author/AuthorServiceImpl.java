@@ -1,8 +1,6 @@
 package com.eagledev.bookreaders.services.author;
 
-import com.eagledev.bookreaders.dtos.author.AuthorAdminResponse;
-import com.eagledev.bookreaders.dtos.author.AuthorRequest;
-import com.eagledev.bookreaders.dtos.author.AuthorResponse;
+import com.eagledev.bookreaders.dtos.author.*;
 import com.eagledev.bookreaders.entities.Author;
 import com.eagledev.bookreaders.exceptions.ResourceNotFoundException;
 import com.eagledev.bookreaders.mappers.AuthorMapper;
@@ -32,7 +30,7 @@ public class AuthorServiceImpl implements AuthorService{
     private final UserAuthorRepo userAuthorRepo;
 
     @Transactional(readOnly = true)
-    public Page<AuthorResponse> getAllAuthors(String query, Pageable pageable) {
+    public Page<AuthorPageResponse> getAllAuthors(String query, Pageable pageable) {
         Page<Author> authors;
         if (query == null || query.isBlank()) {
             authors = authorRepo.findAllByDeletedFalse(pageable);
@@ -40,12 +38,12 @@ public class AuthorServiceImpl implements AuthorService{
             authors = authorRepo.findByNameContainingIgnoreCaseAndDeletedFalse(query, pageable);
         }
         return authors.map(
-                mapper::authorToAuthorResponse
+                mapper::toAuthorPageResponse
         );
     }
 
     @Transactional(readOnly = true)
-    public Page<AuthorAdminResponse> getAllAuthorsForAdmin(String query, Pageable pageable) {
+    public Page<AuthorPageAdminResponse> getAllAuthorsForAdmin(String query, Pageable pageable) {
         Page<Author> authors;
         if (query == null || query.isBlank()) {
             authors = authorRepo.findAll(pageable);
@@ -53,7 +51,7 @@ public class AuthorServiceImpl implements AuthorService{
             authors = authorRepo.findByNameContainingIgnoreCase(query, pageable);
         }
         return authors.map(
-                mapper::authorToAuthorAdminResponse
+                mapper::toAuthorPageAdminResponse
         );
     }
 
@@ -147,6 +145,7 @@ public class AuthorServiceImpl implements AuthorService{
         log.info("Author {} restored successfully", authorId);
     }
 
+    @Transactional
     @Override
     public void hardDeleteAuthor(UUID authorId) {
         Author author = getAuthorById(authorId);

@@ -8,12 +8,17 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 public interface BookRepo extends JpaRepository<Book,Integer> {
     @EntityGraph(attributePaths = {"authors","discussionRoom"})
     Optional<Book> findByUuid(UUID uuid);
+
+    @Override
+    @EntityGraph(attributePaths = {"discussionRoom" , "authors"})
+    Page<Book> findAll(Pageable pageable);
 
     boolean existsByTitle(String title);
 
@@ -23,6 +28,7 @@ public interface BookRepo extends JpaRepository<Book,Integer> {
     @Query("""
     SELECT DISTINCT b FROM Book b
     LEFT JOIN FETCH b.authors a
+    LEFT JOIN FETCH b.discussionRoom d
     LEFT JOIN b.categories c
     WHERE
         LOWER(b.title)       LIKE LOWER(CONCAT('%', :query, '%')) OR
@@ -36,6 +42,7 @@ public interface BookRepo extends JpaRepository<Book,Integer> {
     @Query("""
     SELECT DISTINCT b FROM Book b
     LEFT JOIN FETCH b.authors a
+    LEFT JOIN FETCH b.discussionRoom d
     LEFT JOIN b.categories c
     WHERE
         LOWER(b.title)       LIKE LOWER(CONCAT('%', :query, '%')) OR
@@ -47,4 +54,6 @@ public interface BookRepo extends JpaRepository<Book,Integer> {
     Page<Book> searchUnDeletedBooks(@Param("query") String query, Pageable pageable);
 
     boolean existsByUuid(UUID uuid);
+
+    List<Book> findByUuidIn(List<UUID> uuids);
 }

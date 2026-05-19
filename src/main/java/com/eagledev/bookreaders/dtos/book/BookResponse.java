@@ -22,7 +22,6 @@ public class BookResponse {
     private String language;
     private LocalDate publishDate;
 
-    @JsonProperty("book-cover")
     private String ebookCoverUrl;
 
     private List<BookAuthorResponse> authors;

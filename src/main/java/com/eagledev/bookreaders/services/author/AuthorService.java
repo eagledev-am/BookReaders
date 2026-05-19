@@ -1,8 +1,6 @@
 package com.eagledev.bookreaders.services.author;
 
-import com.eagledev.bookreaders.dtos.author.AuthorAdminResponse;
-import com.eagledev.bookreaders.dtos.author.AuthorRequest;
-import com.eagledev.bookreaders.dtos.author.AuthorResponse;
+import com.eagledev.bookreaders.dtos.author.*;
 import com.eagledev.bookreaders.entities.Author;
 import org.apache.coyote.BadRequestException;
 import org.springframework.data.domain.Page;
@@ -13,8 +11,8 @@ import java.util.UUID;
 
 public interface AuthorService {
     Author getAuthorById(UUID authorId);
-    Page<AuthorResponse> getAllAuthors(String query, Pageable pageable);
-    Page<AuthorAdminResponse> getAllAuthorsForAdmin(String query, Pageable pageable);
+    Page<AuthorPageResponse> getAllAuthors(String query, Pageable pageable);
+    Page<AuthorPageAdminResponse> getAllAuthorsForAdmin(String query, Pageable pageable);
     AuthorResponse getAuthor(UUID authorId);
     AuthorAdminResponse getAuthorForAdmin(UUID authorId);
     AuthorResponse createAuthor(AuthorRequest request , MultipartFile multipartFile) throws BadRequestException;

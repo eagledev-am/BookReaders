@@ -1,4 +1,4 @@
-package com.eagledev.bookreaders.services.tracking;
+package com.eagledev.bookreaders.services.tracking.progress;
 
 import com.eagledev.bookreaders.dtos.tracking.ProgressRequest;
 import com.eagledev.bookreaders.dtos.tracking.ProgressResponse;
@@ -16,14 +16,18 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class ReadingProgressServiceImpl implements ReadingProgressService {
 
-    private final UserReadingProgressRepo progressRepo;
+    private final UserReadingProgressRepo readingProgressRepo;
     private final BookRepo bookRepo;
     private final UserRepo userRepo;
     private final TrackingMapper trackingMapper;
@@ -39,7 +43,7 @@ public class ReadingProgressServiceImpl implements ReadingProgressService {
 
         validateCurrentPage(currentPage, totalPages);
 
-        Optional<UserReadingProgress> existingProgress = progressRepo.findByUserUuidAndBookUuid(userUuid, bookUuid);
+        Optional<UserReadingProgress> existingProgress = readingProgressRepo.findByUserUuidAndBookUuid(userUuid, bookUuid);
 
         UserReadingProgress progress;
         if (existingProgress.isPresent()) {
@@ -61,7 +65,7 @@ public class ReadingProgressServiceImpl implements ReadingProgressService {
                     .build();
         }
 
-        progress = progressRepo.save(progress);
+        progress = readingProgressRepo.save(progress);
         return trackingMapper.toProgressResponse(progress);
     }
 
@@ -72,9 +76,36 @@ public class ReadingProgressServiceImpl implements ReadingProgressService {
             throw new ResourceNotFoundException("Book", "uuid", bookUuid);
         }
 
-        return progressRepo.findByUserUuidAndBookUuid(userUuid, bookUuid)
+        return readingProgressRepo.findByUserUuidAndBookUuid(userUuid, bookUuid)
                 .map(trackingMapper::toProgressResponse)
                 .orElse(null);
+    }
+
+    @Override
+    @Transactional
+    public void grantDigitalAccess(UUID userUuid, List<UUID> bookUuids) {
+        User user = userRepo.findUserByUuid(userUuid)
+                .orElseThrow(() -> new ResourceNotFoundException("User", "uuid", userUuid));
+
+        List<Book> books = bookRepo.findByUuidIn(bookUuids);
+        Map<UUID, Book> bookMap = books.stream()
+                .collect(Collectors.toMap(Book::getUuid, Function.identity()));
+
+        for (UUID bookUuid : bookUuids) {
+            Book book = bookMap.get(bookUuid);
+            if (book == null) {
+                continue;
+            }
+
+            readingProgressRepo.findByUserUuidAndBookUuid(userUuid, bookUuid)
+                    .orElseGet(() -> readingProgressRepo.save(UserReadingProgress.builder()
+                            .user(user)
+                            .book(book)
+                            .status(ReadingStatus.WANT_TO_READ)
+                            .currentPage(0)
+                            .totalPages(book.getNumberOfPages() == null ? 0 : book.getNumberOfPages())
+                            .build()));
+        }
     }
 
     private void validateCurrentPage(int currentPage, int totalPages) {

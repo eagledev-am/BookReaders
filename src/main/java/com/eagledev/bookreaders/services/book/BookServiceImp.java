@@ -1,8 +1,6 @@
 package com.eagledev.bookreaders.services.book;
 
-import com.eagledev.bookreaders.dtos.book.BookAdminResponse;
-import com.eagledev.bookreaders.dtos.book.BookRequest;
-import com.eagledev.bookreaders.dtos.book.BookResponse;
+import com.eagledev.bookreaders.dtos.book.*;
 import com.eagledev.bookreaders.entities.Author;
 import com.eagledev.bookreaders.entities.Book;
 import com.eagledev.bookreaders.entities.Category;
@@ -57,7 +55,7 @@ public class BookServiceImp implements BookService{
     }
 
     @Override
-    public Page<BookResponse> getAllBooks(String query, Pageable pageable) {
+    public Page<BookPageResponse> getAllBooks(String query, Pageable pageable) {
         Page<Book> page;
         if (query == null || query.isBlank()) {
             page = bookRepo.findAllByDeletedFalse(pageable);
@@ -65,12 +63,12 @@ public class BookServiceImp implements BookService{
             page = bookRepo.searchUnDeletedBooks(query, pageable);
         }
         return page.map(
-                bookMapper::bookToBookResponse
+                bookMapper::toPageResponse
         );
     }
 
     @Override
-    public Page<BookAdminResponse> getAllBooksForAdmin(String query, Pageable pageable) {
+    public Page<BookPageAdminResponse> getAllBooksForAdmin(String query, Pageable pageable) {
         Page<Book> page;
         if (query == null || query.isBlank()) {
             page = bookRepo.findAll(pageable);
@@ -78,7 +76,7 @@ public class BookServiceImp implements BookService{
             page = bookRepo.searchBooks(query, pageable);
         }
         return page.map(
-                bookMapper::bookToBookAdminResponse
+                bookMapper::toBookPageAdminResponse
         );
     }
 

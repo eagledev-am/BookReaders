@@ -16,7 +16,7 @@ import com.eagledev.bookreaders.exceptions.ResourceNotFoundException;
 import com.eagledev.bookreaders.exceptions.auth.UserAlreadyExistsException;
 import com.eagledev.bookreaders.repos.UserRepo;
 import com.eagledev.bookreaders.repos.VerificationCodeRepo;
-import com.eagledev.bookreaders.services.email.EmailNotificationPublisher;
+import com.eagledev.bookreaders.services.user.EmailNotificationPublisher;
 import lombok.RequiredArgsConstructor;
 import org.apache.coyote.BadRequestException;
 import org.springframework.security.authentication.AuthenticationManager;

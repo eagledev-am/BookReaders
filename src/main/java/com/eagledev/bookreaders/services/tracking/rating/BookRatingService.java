@@ -1,4 +1,4 @@
-package com.eagledev.bookreaders.services.tracking;
+package com.eagledev.bookreaders.services.tracking.rating;
 
 import com.eagledev.bookreaders.dtos.tracking.RatingRequest;
 import com.eagledev.bookreaders.dtos.tracking.RatingResponse;

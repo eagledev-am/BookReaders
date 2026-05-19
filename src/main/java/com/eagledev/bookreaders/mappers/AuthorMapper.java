@@ -1,8 +1,6 @@
 package com.eagledev.bookreaders.mappers;
 
-import com.eagledev.bookreaders.dtos.author.AuthorAdminResponse;
-import com.eagledev.bookreaders.dtos.author.AuthorBooksResponse;
-import com.eagledev.bookreaders.dtos.author.AuthorResponse;
+import com.eagledev.bookreaders.dtos.author.*;
 import com.eagledev.bookreaders.entities.Author;
 import com.eagledev.bookreaders.entities.Book;
 import com.eagledev.bookreaders.entities.UserAuthor;
@@ -17,6 +15,14 @@ import java.util.stream.Collectors;
 
 @Mapper(componentModel = MappingConstants.ComponentModel.SPRING)
 public interface AuthorMapper {
+
+    @Mapping(source = "followers", target = "followersCount", qualifiedByName = "countFollowers")
+    @Mapping(source = "books", target = "booksCount", qualifiedByName = "countBooks")
+    AuthorPageResponse toAuthorPageResponse(Author author);
+
+    @Mapping(source = "followers", target = "followersCount", qualifiedByName = "countFollowers")
+    @Mapping(source = "books", target = "booksCount", qualifiedByName = "countBooks")
+    AuthorPageAdminResponse toAuthorPageAdminResponse(Author author);
 
     @Mapping(source = "followers", target = "followersCount", qualifiedByName = "countFollowers")
     @Mapping(source = "books", target = "booksCount", qualifiedByName = "countBooks")

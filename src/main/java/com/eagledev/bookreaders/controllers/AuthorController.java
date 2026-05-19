@@ -2,9 +2,7 @@ package com.eagledev.bookreaders.controllers;
 
 import com.eagledev.bookreaders.dtos.api.ApiResponse;
 import com.eagledev.bookreaders.dtos.api.ApiResponseBuilder;
-import com.eagledev.bookreaders.dtos.author.AuthorAdminResponse;
-import com.eagledev.bookreaders.dtos.author.AuthorRequest;
-import com.eagledev.bookreaders.dtos.author.AuthorResponse;
+import com.eagledev.bookreaders.dtos.author.*;
 import com.eagledev.bookreaders.services.author.AuthorService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -34,10 +32,10 @@ public class AuthorController {
 
     @Operation(summary = "Get Public Author List", description = "Returns active authors only.")
     @GetMapping("/api/v1/authors")
-    public ResponseEntity<ApiResponse<Page<AuthorResponse>>> getAllAuthors(
+    public ResponseEntity<ApiResponse<Page<AuthorPageResponse>>> getAllAuthors(
             @RequestParam(required = false) String query,
             @PageableDefault(size = 10, sort = "name") Pageable pageable) {
-        Page<AuthorResponse> authors = authorService.getAllAuthors(query, pageable);
+        Page<AuthorPageResponse> authors = authorService.getAllAuthors(query, pageable);
         return ResponseEntity.ok(
                 ApiResponseBuilder.success("Authors retrieved successfully", authors)
         );
@@ -55,10 +53,10 @@ public class AuthorController {
     @Operation(summary = "Admin: Get All Authors", description = "Includes deleted/inactive authors.")
     @GetMapping("/api/v1/d/authors")
     @PreAuthorize("hasAuthority('ADMIN')")
-    public ResponseEntity<ApiResponse<Page<AuthorAdminResponse>>> getAllAuthorsForAdmin(
+    public ResponseEntity<ApiResponse<Page<AuthorPageAdminResponse>>> getAllAuthorsForAdmin(
             @RequestParam(required = false) String query,
             @PageableDefault(size = 10, sort = "name") Pageable pageable) {
-        Page<AuthorAdminResponse> authors = authorService.getAllAuthorsForAdmin(query, pageable);
+        Page<AuthorPageAdminResponse> authors = authorService.getAllAuthorsForAdmin(query, pageable);
         return ResponseEntity.ok(
                 ApiResponseBuilder.success("Authors retrieved successfully (Admin view)", authors)
         );

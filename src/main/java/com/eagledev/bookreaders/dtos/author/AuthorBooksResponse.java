@@ -15,6 +15,5 @@ public class AuthorBooksResponse {
     private String description;
     private String edition;
     private BigDecimal price;
-    @JsonProperty("book-cover")
     private String ebookCoverUrl;
 }

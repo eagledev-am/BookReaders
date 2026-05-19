@@ -2,9 +2,7 @@ package com.eagledev.bookreaders.controllers;
 
 import com.eagledev.bookreaders.dtos.api.ApiResponse;
 import com.eagledev.bookreaders.dtos.api.ApiResponseBuilder;
-import com.eagledev.bookreaders.dtos.book.BookAdminResponse;
-import com.eagledev.bookreaders.dtos.book.BookRequest;
-import com.eagledev.bookreaders.dtos.book.BookResponse;
+import com.eagledev.bookreaders.dtos.book.*;
 import com.eagledev.bookreaders.services.book.BookService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -34,10 +32,10 @@ public class BookController {
 
     @Operation(summary = "Get Public Book List", description = "Search by title, description, or author. Returns active books only.")
     @GetMapping("/api/v1/books")
-    public ResponseEntity<ApiResponse<Page<BookResponse>>> getAllBooks(
+    public ResponseEntity<ApiResponse<Page<BookPageResponse>>> getAllBooks(
             @RequestParam(required = false) String query,
             @PageableDefault(size = 12, sort = "title") Pageable pageable) {
-        Page<BookResponse> books = bookService.getAllBooks(query, pageable);
+        Page<BookPageResponse> books = bookService.getAllBooks(query, pageable);
         return ResponseEntity.ok(
                 ApiResponseBuilder.success("Books retrieved successfully", books)
         );
@@ -56,10 +54,10 @@ public class BookController {
     @Operation(summary = "Admin: Get All Books", description = "Includes deleted books and extra metadata.")
     @GetMapping("/api/v1/d/books")
     @PreAuthorize("hasAuthority('ADMIN')")
-    public ResponseEntity<ApiResponse<Page<BookAdminResponse>>> getAllBooksForAdmin(
+    public ResponseEntity<ApiResponse<Page<BookPageAdminResponse>>> getAllBooksForAdmin(
             @RequestParam(required = false) String query,
             @PageableDefault(size = 12, sort = "title") Pageable pageable) {
-        Page<BookAdminResponse> books = bookService.getAllBooksForAdmin(query, pageable);
+        Page<BookPageAdminResponse> books = bookService.getAllBooksForAdmin(query, pageable);
         return ResponseEntity.ok(
                 ApiResponseBuilder.success("Books retrieved successfully (Admin view)", books)
         );

@@ -10,18 +10,23 @@ import org.springframework.amqp.support.converter.MessageConverter;
 
 @Configuration
 public class RabbitMqConfig {
-    public static final String EMAIL_EXCHANGE="EMAIL_EXCHANGE";
-    public static final String EMAIL_QUEUE="EMAIL_QUEUE";
-    public static final String EMAIL_ROUTING_KEY="EMAIL_KEY";
+    public static final String USER_EMAIL_EXCHNAGE="USER_EMAIL_EXCHNAGE";
+    public static final String USER_EMAIL_QUEUE="USER_EMAIL_QUEUE";
+    public static final String USER_EMAIL_ROUTING_KEY="EMAIL_KEY";
+
+    public static final String COMMERCE_PAYMENT_EXCHANGE = "COMMERCE_PAYMENT_EXCHANGE";
+    public static final String COMMERCE_PAYMENT_ROUTING_KEY = "COMMERCE_PAYMENT_COMPLETED";
+    public static final String COMMERCE_PAYMENT_FULFILLMENT_QUEUE = "COMMERCE_PAYMENT_FULFILLMENT_QUEUE";
+    public static final String COMMERCE_PAYMENT_RECEIPT_QUEUE = "COMMERCE_PAYMENT_RECEIPT_QUEUE";
 
     @Bean
     public Queue emailQueue(){
-        return new Queue(EMAIL_QUEUE, true);
+        return new Queue(USER_EMAIL_QUEUE, true);
     }
 
     @Bean
     public TopicExchange emailTopicExchange(){
-        return new TopicExchange(EMAIL_EXCHANGE);
+        return new TopicExchange(USER_EMAIL_EXCHNAGE);
     }
 
     @Bean
@@ -29,7 +34,38 @@ public class RabbitMqConfig {
         return BindingBuilder
                 .bind(emailQueue())
                 .to(emailTopicExchange())
-                .with(EMAIL_ROUTING_KEY);
+                .with(USER_EMAIL_ROUTING_KEY);
+    }
+
+    @Bean
+    public Queue commercePaymentFulfillmentQueue() {
+        return new Queue(COMMERCE_PAYMENT_FULFILLMENT_QUEUE, true);
+    }
+
+    @Bean
+    public Queue commercePaymentReceiptQueue() {
+        return new Queue(COMMERCE_PAYMENT_RECEIPT_QUEUE, true);
+    }
+
+    @Bean
+    public TopicExchange commercePaymentExchange() {
+        return new TopicExchange(COMMERCE_PAYMENT_EXCHANGE);
+    }
+
+    @Bean
+    public Binding commercePaymentFulfillmentBinding() {
+        return BindingBuilder
+                .bind(commercePaymentFulfillmentQueue())
+                .to(commercePaymentExchange())
+                .with(COMMERCE_PAYMENT_ROUTING_KEY);
+    }
+
+    @Bean
+    public Binding commercePaymentReceiptBinding() {
+        return BindingBuilder
+                .bind(commercePaymentReceiptQueue())
+                .to(commercePaymentExchange())
+                .with(COMMERCE_PAYMENT_ROUTING_KEY);
     }
 
     @Bean

@@ -1,8 +1,7 @@
-package com.eagledev.bookreaders.services.email;
+package com.eagledev.bookreaders.services.user;
 
 import com.eagledev.bookreaders.config.RabbitMqConfig;
 import com.eagledev.bookreaders.dtos.notification.EmailNotification;
-import lombok.RequiredArgsConstructor;
 import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -17,8 +16,8 @@ public class EmailNotificationPublisher {
 
     public void sendEmailNotification(EmailNotification emailNotification){
         this.template.convertAndSend(
-                RabbitMqConfig.EMAIL_EXCHANGE,
-                RabbitMqConfig.EMAIL_ROUTING_KEY,
+                RabbitMqConfig.USER_EMAIL_EXCHNAGE,
+                RabbitMqConfig.USER_EMAIL_ROUTING_KEY,
                 emailNotification
         );
     }

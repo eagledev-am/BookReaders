@@ -1,8 +1,6 @@
 package com.eagledev.bookreaders.mappers;
 
-import com.eagledev.bookreaders.dtos.book.BookAuthorResponse;
-import com.eagledev.bookreaders.dtos.book.BookAdminResponse;
-import com.eagledev.bookreaders.dtos.book.BookResponse;
+import com.eagledev.bookreaders.dtos.book.*;
 import com.eagledev.bookreaders.entities.Author;
 import com.eagledev.bookreaders.entities.Book;
 import com.eagledev.bookreaders.entities.Category;
@@ -20,6 +18,12 @@ import java.util.stream.Collectors;
 @Mapper(componentModel = MappingConstants.ComponentModel.SPRING, uses = AuthorMapper.class)
 public interface BookMapper {
 
+    @Mapping(source = "ratings", target = "averageRating", qualifiedByName = "calculateAverageRating")
+    @Mapping(source = "authors", target = "authors")
+    BookPageResponse toPageResponse(Book book);
+
+    @Mapping(source = "authors", target = "authors")
+    BookPageAdminResponse toBookPageAdminResponse(Book book);
 
     @Mapping(source = "categories", target = "categories", qualifiedByName = "mapCategoriesTag")
     @Mapping(source = "authors", target = "authors")
