@@ -15,10 +15,10 @@ import java.util.UUID;
 
 public interface PostRepo extends JpaRepository<Post,Integer> {
 
-    @EntityGraph(attributePaths = {"user"})
+    @EntityGraph(attributePaths = {"user" , "comments"})
     Optional<Post> findByUuid(UUID uuid);
 
-    @EntityGraph(attributePaths = {"user"})
+    @EntityGraph(attributePaths = {"user" , "comments"})
     @Query("SELECT p FROM Post p WHERE p.room.uuid = :roomUuid ORDER BY p.createdAt DESC")
     Page<Post> findByRoomUuid(@Param("roomUuid") UUID roomUuid, Pageable pageable);
 
@@ -30,5 +30,17 @@ public interface PostRepo extends JpaRepository<Post,Integer> {
     Set<UUID> findPostUuidsLikedByUser(@Param("userUuid") UUID userUuid,
                                        @Param("postUuids") List<UUID> postUuids);
 
+    @EntityGraph(attributePaths = {"user"})
+    Page<Post> findAll(Pageable pageable);
 
+    @EntityGraph(attributePaths = {"user"})
+    @Query("""
+        SELECT p FROM Post p
+        JOIN p.user u
+        WHERE LOWER(p.title) LIKE LOWER(CONCAT('%', :query, '%'))
+           OR LOWER(p.content) LIKE LOWER(CONCAT('%', :query, '%'))
+           OR LOWER(u.name) LIKE LOWER(CONCAT('%', :query, '%'))
+        ORDER BY p.createdAt DESC
+    """)
+    Page<Post> searchPosts(@Param("query") String query, Pageable pageable);
 }
