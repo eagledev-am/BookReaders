@@ -39,7 +39,7 @@ public class AuthController {
     }
 
     @Operation(summary = "Verify account", description = "Activates the account using the email code.")
-    @PostMapping(name = "/verify" , params = {"email" , "code"})
+    @PostMapping(value = "/verify" , params = {"email" , "code"})
     public ResponseEntity<String> verifyAccount(
             @Valid @Email @RequestParam String email , @RequestParam String code
     ) {
