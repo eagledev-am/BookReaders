@@ -1,5 +1,6 @@
 package com.eagledev.bookreaders.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.BatchSize;
@@ -70,7 +71,8 @@ public class Book{
     )
     private List<Category> categories;
 
-    @OneToOne(mappedBy = "book",cascade = CascadeType.ALL,optional = true)
+    @OneToOne(mappedBy = "book", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
     private DiscussionRoom discussionRoom;
 
     public void setAuthors(List<Author> authors) {
