@@ -13,4 +13,6 @@ public interface PostService {
     PostResponse getPostDetails(UUID postUUid , UUID currentUserUUid);
     PostResponse updatePost(UUID postUUid ,UUID currentUserUUid ,PostRequest request);
     void deletePost(UUID postUuid, UUID currentUserUUid);
+    Page<PostResponse> getAllPosts(Pageable pageable);
+    Page<PostResponse> searchPosts(String query, Pageable pageable);
 }

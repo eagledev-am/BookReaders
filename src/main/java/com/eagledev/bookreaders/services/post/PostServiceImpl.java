@@ -110,6 +110,20 @@ public class PostServiceImpl implements PostService{
         repo.delete(post);
     }
 
+    @Override
+    public Page<PostResponse> getAllPosts(Pageable pageable) {
+        return repo.findAll(pageable).map(post -> postMapper.postToPostResponse(post, false));
+    }
+
+    @Override
+    public Page<PostResponse> searchPosts(String query, Pageable pageable) {
+        String normalized = query == null ? "" : query.trim();
+        if (normalized.isBlank()) {
+            return getAllPosts(pageable);
+        }
+        return repo.searchPosts(normalized, pageable).map(post -> postMapper.postToPostResponse(post, false));
+    }
+
     Post getPostByUUid(UUID postUUid){
         return repo.findByUuid(postUUid).orElseThrow(
                 () -> new ResourceNotFoundException("Post", "id",postUUid)
