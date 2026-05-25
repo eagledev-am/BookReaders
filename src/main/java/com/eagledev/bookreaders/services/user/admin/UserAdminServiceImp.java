@@ -68,13 +68,16 @@ public class UserAdminServiceImp implements UserAdminService {
     public AdminUserResponse updateUser(UUID userUuid, AdminUserUpdateRequest request) {
         User user = getUserById(userUuid);
 
+        if(request.getPassword() != null && !request.getPassword().isBlank()){
+            user.setPassword(passwordEncoder.encode(request.getPassword()));
+        }
+
         user.setName(request.getName());
         user.setEmail(request.getEmail());
         user.setBio(request.getBio());
         user.setDateOfBirth(request.getDateOfBirth());
         user.setPhotoUrl(request.getPhotoUrl());
         user.setRole(request.getRole());
-        user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setEnabled(request.getEnabled());
         User saved = userRepo.save(user);
 
