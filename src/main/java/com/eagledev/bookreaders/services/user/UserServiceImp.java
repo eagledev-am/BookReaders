@@ -174,9 +174,9 @@ public class UserServiceImp implements UserService{
     @Override
     public List<AuthorResponse> getFollowedAuthors(UUID userId) {
         User user = getUserById(userId);
-        return user.getFollowingAuthor()
+        return userAuthorRepo.findByUserId(user.getId())
                 .stream()
-                .map(authorMapper::userAuthorToAuthorResponse)
+                .map(ua -> authorMapper.authorToAuthorResponse(ua.getAuthor()))
                 .toList();
     }
 
