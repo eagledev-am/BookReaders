@@ -16,10 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -35,37 +32,40 @@ public class ReadingProgressServiceImpl implements ReadingProgressService {
     @Override
     @Transactional
     public ProgressResponse updateProgress(UUID bookUuid, UUID userUuid, ProgressRequest request) {
+        int currentPage = request.getCurrentPage();
+
         Book book = bookRepo.findByUuid(bookUuid)
                 .orElseThrow(() -> new ResourceNotFoundException("Book", "uuid", bookUuid));
 
         int totalPages = book.getNumberOfPages() != null ? book.getNumberOfPages() : 0;
-        int currentPage = request.getCurrentPage();
 
         validateCurrentPage(currentPage, totalPages);
 
-        Optional<UserReadingProgress> existingProgress = readingProgressRepo.findByUserUuidAndBookUuid(userUuid, bookUuid);
+        ReadingStatus status = determineStatus(currentPage, totalPages, request.getStatus());
+        LocalDateTime now = LocalDateTime.now();
 
-        UserReadingProgress progress;
-        if (existingProgress.isPresent()) {
-            progress = existingProgress.get();
-            progress.setCurrentPage(currentPage);
-            progress.setStatus(determineStatus(currentPage, totalPages, request.getStatus()));
-            progress.setLastReadAt(LocalDateTime.now());
-        } else {
-            User user = userRepo.findUserByUuid(userUuid)
-                    .orElseThrow(() -> new ResourceNotFoundException("User", "uuid", userUuid));
+        UserReadingProgress progress = readingProgressRepo
+                .findByUserUuidAndBookUuid(userUuid, bookUuid)
+                .map(existing -> {
+                    existing.setCurrentPage(currentPage);
+                    existing.setStatus(status);
+                    existing.setLastReadAt(now);
+                    return existing;
+                })
+                .orElseGet(() -> {
+                    User user = userRepo.findUserByUuid(userUuid)
+                            .orElseThrow(() -> new ResourceNotFoundException("User", "uuid", userUuid));
 
-            progress = UserReadingProgress.builder()
-                    .user(user)
-                    .book(book)
-                    .currentPage(currentPage)
-                    .totalPages(totalPages)
-                    .status(determineStatus(currentPage, totalPages, request.getStatus()))
-                    .lastReadAt(LocalDateTime.now())
-                    .build();
-        }
-
-        progress = readingProgressRepo.save(progress);
+                    return UserReadingProgress.builder()
+                            .user(user)
+                            .book(book)
+                            .currentPage(currentPage)
+                            .totalPages(totalPages)
+                            .status(status)
+                            .lastReadAt(now)
+                            .build();
+                });
+        readingProgressRepo.save(progress);
         return trackingMapper.toProgressResponse(progress);
     }
 
@@ -88,24 +88,24 @@ public class ReadingProgressServiceImpl implements ReadingProgressService {
                 .orElseThrow(() -> new ResourceNotFoundException("User", "uuid", userUuid));
 
         List<Book> books = bookRepo.findByUuidIn(bookUuids);
-        Map<UUID, Book> bookMap = books.stream()
-                .collect(Collectors.toMap(Book::getUuid, Function.identity()));
 
-        for (UUID bookUuid : bookUuids) {
-            Book book = bookMap.get(bookUuid);
-            if (book == null) {
-                continue;
-            }
+        Set<UUID> existingBookUuids = readingProgressRepo.findByUserUuid(userUuid)
+                .stream()
+                .map(p -> p.getBook().getUuid())
+                .collect(Collectors.toSet());
 
-            readingProgressRepo.findByUserUuidAndBookUuid(userUuid, bookUuid)
-                    .orElseGet(() -> readingProgressRepo.save(UserReadingProgress.builder()
-                            .user(user)
-                            .book(book)
-                            .status(ReadingStatus.WANT_TO_READ)
-                            .currentPage(0)
-                            .totalPages(book.getNumberOfPages() == null ? 0 : book.getNumberOfPages())
-                            .build()));
-        }
+        List<UserReadingProgress> newRecords = books.stream()
+                .filter(book -> !existingBookUuids.contains(book.getUuid()))
+                .map(book -> UserReadingProgress.builder()
+                        .user(user)
+                        .book(book)
+                        .status(ReadingStatus.WANT_TO_READ)
+                        .currentPage(0)
+                        .totalPages(book.getNumberOfPages() != null ? book.getNumberOfPages() : 0)
+                        .build())
+                .toList();
+
+        readingProgressRepo.saveAll(newRecords);
     }
 
     private void validateCurrentPage(int currentPage, int totalPages) {
