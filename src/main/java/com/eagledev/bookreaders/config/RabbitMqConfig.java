@@ -15,9 +15,11 @@ public class RabbitMqConfig {
     public static final String USER_EMAIL_ROUTING_KEY="EMAIL_KEY";
 
     public static final String COMMERCE_PAYMENT_EXCHANGE = "COMMERCE_PAYMENT_EXCHANGE";
-    public static final String COMMERCE_PAYMENT_ROUTING_KEY = "COMMERCE_PAYMENT_COMPLETED";
+    public static final String COMMERCE_PAYMENT_ROUTING_KEY = "COMMERCE_PAYMENT_ROUTING_KEY";
     public static final String COMMERCE_PAYMENT_FULFILLMENT_QUEUE = "COMMERCE_PAYMENT_FULFILLMENT_QUEUE";
     public static final String COMMERCE_PAYMENT_RECEIPT_QUEUE = "COMMERCE_PAYMENT_RECEIPT_QUEUE";
+    public static final String COMMERCE_PAYMENT_CANCELLED_ROUTING_KEY = "COMMERCE_PAYMENT_CANCELLED_ROUTING_KEY";
+    public static final String COMMERCE_PAYMENT_CANCELLED_QUEUE = "COMMERCE_PAYMENT_CANCELLED";
 
     @Bean
     public Queue emailQueue(){
@@ -48,6 +50,9 @@ public class RabbitMqConfig {
     }
 
     @Bean
+    public Queue commercePaymentCancelledQueue() { return new Queue(COMMERCE_PAYMENT_CANCELLED_QUEUE, true);}
+
+    @Bean
     public TopicExchange commercePaymentExchange() {
         return new TopicExchange(COMMERCE_PAYMENT_EXCHANGE);
     }
@@ -66,6 +71,14 @@ public class RabbitMqConfig {
                 .bind(commercePaymentReceiptQueue())
                 .to(commercePaymentExchange())
                 .with(COMMERCE_PAYMENT_ROUTING_KEY);
+    }
+
+    @Bean
+    public Binding commercePaymentCancelledBinding() {
+        return BindingBuilder
+                .bind(commercePaymentCancelledQueue())
+                .to(commercePaymentExchange())
+                .with(COMMERCE_PAYMENT_CANCELLED_ROUTING_KEY);
     }
 
     @Bean
