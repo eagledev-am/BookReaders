@@ -1,0 +1,4773 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "BookReaders API",
+    "description": "BookReaders REST API\n\nA comprehensive backend for a book reader community platform supporting catalog browsing, reading progress tracking, social engagement, and a full commerce experience.\n\n**Key Features:**\n- **Public:** Browse books, authors, and categories.\n- **User:** Track reading progress, rate books, manage cart, place orders, participate in discussions.\n- **Admin:** Full back-office control over catalog, users, posts, orders, and promocodes.\n\n**Authentication:**\nThis API uses JWT (JSON Web Tokens). Register via `/api/v1/auth/register` or log in via `/api/v1/auth/authenticate` to obtain a Bearer token.",   "contact": {
+      "name": "API Support",
+      "email": "bookreaders@email.com"
+    },
+    "license": {
+      "name": "Apache 2.0",
+      "url": "https://www.apache.org/licenses/LICENSE-2.0"
+    },
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8080",
+      "description": "Development server (uses test data)"
+    }
+  ],
+  "security": [
+    {
+      "bearerAuth": []
+    }
+  ],
+  "tags": [
+    {
+      "name": "Social - Comments",
+      "description": "Manage post comments and replies"
+    },
+    {
+      "name": "Admin - Users",
+      "description": "Admin user management"
+    },
+    {
+      "name": "Social - Discussion Rooms",
+      "description": "Get the room for a specific book"
+    },
+    {
+      "name": "Commerce - Addresses",
+      "description": "Manage user addresses"
+    },
+    {
+      "name": "Tracking",
+      "description": "Track reading progress and rate books"
+    },
+    {
+      "name": "Categories",
+      "description": "Manage book categories/genres"
+    },
+    {
+      "name": "Social - Likes",
+      "description": "Manage post likes"
+    },
+    {
+      "name": "Books",
+      "description": "Browse, search, and manage books"
+    },
+    {
+      "name": "Commerce - Orders",
+      "description": "Checkout and order management"
+    },
+    {
+      "name": "Authors",
+      "description": "Public and Admin endpoints for managing authors"
+    },
+    {
+      "name": "Commerce - Promocodes",
+      "description": "Manage promocodes"
+    },
+    {
+      "name": "Authentication",
+      "description": "Endpoints for login, registration, and account recovery"
+    },
+    {
+      "name": "User Profile",
+      "description": "Endpoints for managing user profile, social links, and author subscriptions"
+    },
+    {
+      "name": "Social - Posts",
+      "description": "Manage discussion posts"
+    },
+    {
+      "name": "Admin - Posts",
+      "description": "Admin post moderation"
+    },
+    {
+      "name": "Commerce - Cart",
+      "description": "Manage cart items"
+    }
+  ],
+  "paths": {
+    "/api/v1/u/me": {
+      "get": {
+        "tags": [
+          "User Profile"
+        ],
+        "summary": "Get current user profile",
+        "operationId": "getMyProfile",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseUserProfileResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "User Profile"
+        ],
+        "summary": "Update profile info",
+        "operationId": "updateProfile",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserProfileRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseUserProfileResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/posts/{postUuid}": {
+      "get": {
+        "tags": [
+          "Social - Posts"
+        ],
+        "summary": "Get post details",
+        "description": "Returns a single post.",
+        "operationId": "getPostDetails",
+        "parameters": [
+          {
+            "name": "postUuid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponsePostResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Social - Posts"
+        ],
+        "summary": "Update a post",
+        "description": "Edit the content of an existing post.",
+        "operationId": "updatePost",
+        "parameters": [
+          {
+            "name": "postUuid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PostRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponsePostResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Social - Posts"
+        ],
+        "summary": "Delete a post",
+        "operationId": "deletePost",
+        "parameters": [
+          {
+            "name": "postUuid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseVoid"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/commerce/promocodes/{uuid}": {
+      "get": {
+        "tags": [
+          "Commerce - Promocodes"
+        ],
+        "summary": "Get promocode by UUID",
+        "operationId": "getByUuid",
+        "parameters": [
+          {
+            "name": "uuid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponsePromocodeDto"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Commerce - Promocodes"
+        ],
+        "summary": "Update promocode",
+        "operationId": "update",
+        "parameters": [
+          {
+            "name": "uuid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PromocodeDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponsePromocodeDto"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Commerce - Promocodes"
+        ],
+        "summary": "Delete promocode",
+        "operationId": "delete",
+        "parameters": [
+          {
+            "name": "uuid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseVoid"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/commerce/addresses/{addressUuid}": {
+      "put": {
+        "tags": [
+          "Commerce - Addresses"
+        ],
+        "summary": "Update address",
+        "operationId": "updateAddress",
+        "parameters": [
+          {
+            "name": "addressUuid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddressDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseAddressDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/comments/{commentUuid}": {
+      "put": {
+        "tags": [
+          "Social - Comments"
+        ],
+        "summary": "Update a comment",
+        "description": "Updates the text of an existing comment. User must be the owner.",
+        "operationId": "updateComment",
+        "parameters": [
+          {
+            "name": "commentUuid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CommentRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseCommentResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Social - Comments"
+        ],
+        "summary": "Delete a comment",
+        "description": "Deletes a comment. User must be the owner.",
+        "operationId": "deleteComment",
+        "parameters": [
+          {
+            "name": "commentUuid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseVoid"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/categories/{tag}": {
+      "put": {
+        "tags": [
+          "Categories"
+        ],
+        "summary": "Update catalog",
+        "operationId": "update_1",
+        "parameters": [
+          {
+            "name": "tag",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CategoryDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseCategoryDto"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Categories"
+        ],
+        "summary": "Delete catalog",
+        "operationId": "delete_1",
+        "parameters": [
+          {
+            "name": "tag",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseVoid"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/books/{uuid}": {
+      "get": {
+        "tags": [
+          "Books"
+        ],
+        "summary": "Get Public Book Details",
+        "operationId": "getBook",
+        "parameters": [
+          {
+            "name": "uuid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseBookResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Books"
+        ],
+        "summary": "Admin: Update Book Info",
+        "description": "Updates text fields only. Use PATCH for photo/file.",
+        "operationId": "updateBook",
+        "parameters": [
+          {
+            "name": "uuid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BookRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseBookResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/books/{bookUuid}/rating": {
+      "get": {
+        "tags": [
+          "Tracking"
+        ],
+        "summary": "Get user's rating",
+        "description": "Get the current user's rating for a specific book.",
+        "operationId": "getRating",
+        "parameters": [
+          {
+            "name": "bookUuid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseRatingResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Tracking"
+        ],
+        "summary": "Rate a book",
+        "description": "Add or update the current user's rating for a specific book (score 1-5).",
+        "operationId": "rateBook",
+        "parameters": [
+          {
+            "name": "bookUuid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RatingRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseRatingResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/books/{bookUuid}/progress": {
+      "get": {
+        "tags": [
+          "Tracking"
+        ],
+        "summary": "Get reading progress",
+        "description": "Get the current user's reading progress for a specific book.",
+        "operationId": "getProgress",
+        "parameters": [
+          {
+            "name": "bookUuid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseProgressResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Tracking"
+        ],
+        "summary": "Update reading progress",
+        "description": "Update or create reading progress for the current user on a specific book.",
+        "operationId": "updateProgress",
+        "parameters": [
+          {
+            "name": "bookUuid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProgressRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseProgressResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/authors/{id}": {
+      "get": {
+        "tags": [
+          "Authors"
+        ],
+        "summary": "Get Public Author Details",
+        "operationId": "getAuthor",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseAuthorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Authors"
+        ],
+        "summary": "Admin: Update Author Info",
+        "description": "Updates text fields only. Use PATCH for photo.",
+        "operationId": "updateAuthor",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AuthorRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseAuthorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/users/{id}": {
+      "put": {
+        "tags": [
+          "Admin - Users"
+        ],
+        "summary": "update user (admin)",
+        "operationId": "updateUser",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdminUserUpdateRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseAdminUserResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/u/me/photo": {
+      "post": {
+        "tags": [
+          "User Profile"
+        ],
+        "summary": "Upload profile photo",
+        "operationId": "uploadPhoto",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                },
+                "required": [
+                  "file"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseString"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/u/me/password": {
+      "post": {
+        "tags": [
+          "User Profile"
+        ],
+        "summary": "Change password",
+        "operationId": "changePassword",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChangePasswordRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseVoid"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/u/me/contacts": {
+      "post": {
+        "tags": [
+          "User Profile"
+        ],
+        "summary": "Add a social contact link",
+        "operationId": "addContact",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserContactDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseListUserContactDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/u/me/authors/{authorId}": {
+      "post": {
+        "tags": [
+          "User Profile"
+        ],
+        "summary": "Follow an author",
+        "operationId": "followAuthor",
+        "parameters": [
+          {
+            "name": "authorId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseVoid"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "User Profile"
+        ],
+        "summary": "Unfollow an author",
+        "operationId": "unFollowAuthor",
+        "parameters": [
+          {
+            "name": "authorId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseVoid"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/rooms/{roomUuid}/posts": {
+      "get": {
+        "tags": [
+          "Social - Posts"
+        ],
+        "summary": "Get posts feed",
+        "description": "Paginated list of posts for a room.",
+        "operationId": "getPosts",
+        "parameters": [
+          {
+            "name": "roomUuid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "pageable",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Pageable"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponsePagePostResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Social - Posts"
+        ],
+        "summary": "Create a new post",
+        "description": "Adds a post to a specific discussion room.",
+        "operationId": "createPost",
+        "parameters": [
+          {
+            "name": "roomUuid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PostRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponsePostResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/posts/{postUuid}/like": {
+      "post": {
+        "tags": [
+          "Social - Likes"
+        ],
+        "summary": "Toggle like on a post",
+        "description": "Likes the post if not already liked, unlikes if already liked.",
+        "operationId": "toggleLike",
+        "parameters": [
+          {
+            "name": "postUuid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseBoolean"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/posts/{postUuid}/comments": {
+      "get": {
+        "tags": [
+          "Social - Comments"
+        ],
+        "summary": "Get comments for a post",
+        "description": "Returns paginated top-level comments for a post. Replies can be fetched lazily.",
+        "operationId": "getComments",
+        "parameters": [
+          {
+            "name": "postUuid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "pageable",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Pageable"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponsePageCommentResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Social - Comments"
+        ],
+        "summary": "Add a comment to a post",
+        "description": "Creates a top-level comment on a specific post.",
+        "operationId": "addComment",
+        "parameters": [
+          {
+            "name": "postUuid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CommentRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseCommentResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/commerce/promocodes": {
+      "get": {
+        "tags": [
+          "Commerce - Promocodes"
+        ],
+        "summary": "List all promocodes",
+        "operationId": "getAll",
+        "parameters": [
+          {
+            "name": "code",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "pageable",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Pageable"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponsePagePromocodeDto"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Commerce - Promocodes"
+        ],
+        "summary": "Create promocode",
+        "operationId": "create",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PromocodeDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponsePromocodeDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/commerce/orders/checkout": {
+      "post": {
+        "tags": [
+          "Commerce - Orders"
+        ],
+        "summary": "Checkout cart",
+        "operationId": "checkout",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CheckoutRequestDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseOrderResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/commerce/cart/items/{bookUuid}": {
+      "post": {
+        "tags": [
+          "Commerce - Cart"
+        ],
+        "summary": "Add item to cart",
+        "operationId": "addItem",
+        "parameters": [
+          {
+            "name": "bookUuid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseCartResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Commerce - Cart"
+        ],
+        "summary": "Remove item from cart",
+        "operationId": "removeItem",
+        "parameters": [
+          {
+            "name": "bookUuid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseCartResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/commerce/addresses": {
+      "get": {
+        "tags": [
+          "Commerce - Addresses"
+        ],
+        "summary": "Get user addresses",
+        "operationId": "getUserAddresses",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseListAddressDto"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Commerce - Addresses"
+        ],
+        "summary": "Add address",
+        "operationId": "addAddress",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddressDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseAddressDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/comments/{parentUuid}/replies": {
+      "post": {
+        "tags": [
+          "Social - Comments"
+        ],
+        "summary": "Reply to a comment",
+        "description": "Creates a reply to an existing comment.",
+        "operationId": "replyToComment",
+        "parameters": [
+          {
+            "name": "parentUuid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CommentRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseCommentResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/categories": {
+      "get": {
+        "tags": [
+          "Categories"
+        ],
+        "summary": "List all categories",
+        "operationId": "getAll_1",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseListCategoryDto"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Categories"
+        ],
+        "summary": "Create new category",
+        "operationId": "create_1",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CategoryDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseCategoryDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/books": {
+      "get": {
+        "tags": [
+          "Books"
+        ],
+        "summary": "Get Public Book List",
+        "description": "Search by title, description, or author. Returns active books only.",
+        "operationId": "getAllBooks",
+        "parameters": [
+          {
+            "name": "query",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "pageable",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Pageable"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponsePageBookPageResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Books"
+        ],
+        "summary": "Admin: Create Book",
+        "description": "Upload JSON data and E-book cover together.",
+        "operationId": "createBook",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "data": {
+                    "$ref": "#/components/schemas/BookRequest"
+                  },
+                  "file": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                },
+                "required": [
+                  "data"
+                ]
+              },
+              "encoding": {
+                "data": {
+                  "contentType": "application/json"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseBookResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/books/{uuid}/restore": {
+      "post": {
+        "tags": [
+          "Books"
+        ],
+        "summary": "Admin: Restore Soft-Deleted Book",
+        "operationId": "restoreBook",
+        "parameters": [
+          {
+            "name": "uuid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseVoid"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/authors": {
+      "get": {
+        "tags": [
+          "Authors"
+        ],
+        "summary": "Get Public Author List",
+        "description": "Returns active authors only.",
+        "operationId": "getAllAuthors",
+        "parameters": [
+          {
+            "name": "query",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "pageable",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Pageable"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponsePageAuthorPageResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Authors"
+        ],
+        "summary": "Admin: Create Author",
+        "description": "Upload JSON data and Image file together.",
+        "operationId": "createAuthor",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "data": {
+                    "$ref": "#/components/schemas/AuthorRequest"
+                  },
+                  "file": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                },
+                "required": [
+                  "data"
+                ]
+              },
+              "encoding": {
+                "data": {
+                  "contentType": "application/json"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseAuthorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/authors/{id}/restore": {
+      "post": {
+        "tags": [
+          "Authors"
+        ],
+        "summary": "Admin: Restore Author",
+        "description": "Recovers a soft-deleted author.",
+        "operationId": "restoreAuthor",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseVoid"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/auth/verify": {
+      "post": {
+        "tags": [
+          "Authentication"
+        ],
+        "summary": "Verify account",
+        "description": "Activates the account using the email code.",
+        "operationId": "verifyAccount",
+        "parameters": [
+          {
+            "name": "email",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "email"
+            }
+          },
+          {
+            "name": "code",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/auth/reset-password": {
+      "post": {
+        "tags": [
+          "Authentication"
+        ],
+        "summary": "Reset password",
+        "description": "Updates password if the verification code is valid.",
+        "operationId": "resetPassword",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResetPasswordRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/auth/resend-code": {
+      "post": {
+        "tags": [
+          "Authentication"
+        ],
+        "summary": "Resend verification code",
+        "description": "Resends the code for activation or password reset.",
+        "operationId": "resendCode",
+        "parameters": [
+          {
+            "name": "email",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/auth/register": {
+      "post": {
+        "tags": [
+          "Authentication"
+        ],
+        "summary": "Register a new user",
+        "description": "Creates a new account and sends a verification email.",
+        "operationId": "register",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegisterRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/auth/authenticate": {
+      "post": {
+        "tags": [
+          "Authentication"
+        ],
+        "summary": "Authenticate user",
+        "description": "Returns a JWT token if credentials are valid.",
+        "operationId": "authenticate",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AuthRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/users": {
+      "get": {
+        "tags": [
+          "Admin - Users"
+        ],
+        "summary": "List users (admin)",
+        "operationId": "getUsers",
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "pageable",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Pageable"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponsePageAdminUserResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Admin - Users"
+        ],
+        "summary": "Create user (admin)",
+        "operationId": "createUser",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdminUserRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseAdminUserResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/commerce/promocodes/{uuid}/active": {
+      "patch": {
+        "tags": [
+          "Commerce - Promocodes"
+        ],
+        "summary": "Set promocode active status",
+        "operationId": "setActive",
+        "parameters": [
+          {
+            "name": "uuid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "active",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponsePromocodeDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/commerce/orders/{orderUuid}/mark-paid": {
+      "patch": {
+        "tags": [
+          "Commerce - Orders"
+        ],
+        "summary": "Mark order as paid",
+        "operationId": "markOrderAsPaid",
+        "parameters": [
+          {
+            "name": "orderUuid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseOrderResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/commerce/orders/{orderUuid}/cancel": {
+      "patch": {
+        "tags": [
+          "Commerce - Orders"
+        ],
+        "summary": "Cancell Order",
+        "operationId": "cancelOrder",
+        "parameters": [
+          {
+            "name": "orderUuid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/commerce/addresses/{addressUuid}/default": {
+      "patch": {
+        "tags": [
+          "Commerce - Addresses"
+        ],
+        "summary": "Set default address",
+        "operationId": "setDefaultAddress",
+        "parameters": [
+          {
+            "name": "addressUuid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseAddressDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/books/{uuid}/cover": {
+      "patch": {
+        "tags": [
+          "Books"
+        ],
+        "summary": "Admin: Update Book Cover Photo",
+        "operationId": "updateBookPhoto",
+        "parameters": [
+          {
+            "name": "uuid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                },
+                "required": [
+                  "file"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseVoid"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/authors/{id}/photo": {
+      "patch": {
+        "tags": [
+          "Authors"
+        ],
+        "summary": "Admin: Update Author Photo",
+        "operationId": "updateAuthorPhoto",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                },
+                "required": [
+                  "file"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseVoid"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/users/{userUuid}/unblock": {
+      "patch": {
+        "tags": [
+          "Admin - Users"
+        ],
+        "summary": "Unblock user (admin)",
+        "operationId": "unblockUser",
+        "parameters": [
+          {
+            "name": "userUuid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseAdminUserResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/users/{userUuid}/block": {
+      "patch": {
+        "tags": [
+          "Admin - Users"
+        ],
+        "summary": "Block user (admin)",
+        "operationId": "blockUser",
+        "parameters": [
+          {
+            "name": "userUuid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseAdminUserResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/u/{id}": {
+      "get": {
+        "tags": [
+          "User Profile"
+        ],
+        "summary": "Get specific user profile (Public view)",
+        "operationId": "getUserProfile",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseUserProfileResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/u/me/books": {
+      "get": {
+        "tags": [
+          "User Profile"
+        ],
+        "summary": "Get list of reading books",
+        "operationId": "getReadingBooks",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseListObject"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/u/me/authors": {
+      "get": {
+        "tags": [
+          "User Profile"
+        ],
+        "summary": "Get list of authors the user follows",
+        "operationId": "getMyFollowedAuthors",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseListObject"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/file/{subDirectory}/{fileName}": {
+      "get": {
+        "tags": [
+          "file-controller"
+        ],
+        "summary": "Get file Resource",
+        "operationId": "getFile",
+        "parameters": [
+          {
+            "name": "subDirectory",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "fileName",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/d/books": {
+      "get": {
+        "tags": [
+          "Books"
+        ],
+        "summary": "Admin: Get All Books",
+        "description": "Includes deleted books and extra metadata.",
+        "operationId": "getAllBooksForAdmin",
+        "parameters": [
+          {
+            "name": "query",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "pageable",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Pageable"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponsePageBookPageAdminResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/d/books/{uuid}": {
+      "get": {
+        "tags": [
+          "Books"
+        ],
+        "summary": "Admin: Get Detailed Book View",
+        "operationId": "getBookForAdmin",
+        "parameters": [
+          {
+            "name": "uuid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseBookAdminResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/d/authors": {
+      "get": {
+        "tags": [
+          "Authors"
+        ],
+        "summary": "Admin: Get All Authors",
+        "description": "Includes deleted/inactive authors.",
+        "operationId": "getAllAuthorsForAdmin",
+        "parameters": [
+          {
+            "name": "query",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "pageable",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Pageable"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponsePageAuthorPageAdminResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/d/authors/{id}": {
+      "get": {
+        "tags": [
+          "Authors"
+        ],
+        "summary": "Admin: Get Detailed Author View",
+        "operationId": "getAuthorForAdmin",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseAuthorAdminResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/commerce/orders": {
+      "get": {
+        "tags": [
+          "Commerce - Orders"
+        ],
+        "summary": "List current user's orders",
+        "operationId": "getMyOrders",
+        "parameters": [
+          {
+            "name": "pageable",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Pageable"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponsePageOrderResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/commerce/orders/{orderUuid}/items": {
+      "get": {
+        "tags": [
+          "Commerce - Orders"
+        ],
+        "summary": "Get order items (owner or admin)",
+        "operationId": "getOrderItems",
+        "parameters": [
+          {
+            "name": "orderUuid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseListOrderItemResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/commerce/cart": {
+      "get": {
+        "tags": [
+          "Commerce - Cart"
+        ],
+        "summary": "Get cart",
+        "operationId": "getCart",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseCartResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Commerce - Cart"
+        ],
+        "summary": "Clear cart",
+        "operationId": "clearCart",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseVoid"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/commerce/admin/orders": {
+      "get": {
+        "tags": [
+          "Commerce - Orders"
+        ],
+        "summary": "List all orders (admin)",
+        "operationId": "getAllOrders",
+        "parameters": [
+          {
+            "name": "pageable",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Pageable"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponsePageOrderResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/books/{bookUuid}/discussion-room": {
+      "get": {
+        "tags": [
+          "Social - Discussion Rooms"
+        ],
+        "summary": "Get Discussion Room for a Book",
+        "description": "Returns the discussion room details for a specific book",
+        "operationId": "getRoomForBook",
+        "parameters": [
+          {
+            "name": "bookUuid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseDiscussionRoomResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/posts": {
+      "get": {
+        "tags": [
+          "Admin - Posts"
+        ],
+        "summary": "List posts (admin)",
+        "operationId": "getPosts_1",
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "pageable",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Pageable"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponsePagePostResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/": {
+      "get": {
+        "tags": [
+          "base"
+        ],
+        "operationId": "test",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/commerce/orders/{orderUuid}": {
+      "delete": {
+        "tags": [
+          "Commerce - Orders"
+        ],
+        "summary": "Delete current user's order",
+        "operationId": "deleteMyOrder",
+        "parameters": [
+          {
+            "name": "orderUuid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseVoid"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/books/{uuid}/soft": {
+      "delete": {
+        "tags": [
+          "Books"
+        ],
+        "summary": "Admin: Soft Delete Book",
+        "operationId": "deleteBook",
+        "parameters": [
+          {
+            "name": "uuid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseVoid"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/books/{uuid}/hard": {
+      "delete": {
+        "tags": [
+          "Books"
+        ],
+        "summary": "Admin: Hard Delete Book",
+        "description": "Permanently removes the book and its files.",
+        "operationId": "hardDeleteBook",
+        "parameters": [
+          {
+            "name": "uuid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseVoid"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/authors/{id}/soft": {
+      "delete": {
+        "tags": [
+          "Authors"
+        ],
+        "summary": "Admin: Soft Delete Author",
+        "operationId": "deleteAuthor",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseVoid"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/authors/{id}/hard": {
+      "delete": {
+        "tags": [
+          "Authors"
+        ],
+        "summary": "Admin: Hard Delete Author",
+        "description": "Permanently removes the author from DB.",
+        "operationId": "hardDeleteAuthor",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseVoid"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/users/{userUuid}": {
+      "delete": {
+        "tags": [
+          "Admin - Users"
+        ],
+        "summary": "Delete user (admin)",
+        "operationId": "deleteUser",
+        "parameters": [
+          {
+            "name": "userUuid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseVoid"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/posts/{postUuid}": {
+      "delete": {
+        "tags": [
+          "Admin - Posts"
+        ],
+        "summary": "Delete post (admin)",
+        "operationId": "deletePost_1",
+        "parameters": [
+          {
+            "name": "postUuid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseVoid"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "UserProfileRequest": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 50,
+            "minLength": 3
+          },
+          "bio": {
+            "type": "string"
+          },
+          "dateOfBirth": {
+            "type": "string",
+            "format": "date"
+          }
+        },
+        "required": [
+          "bio",
+          "dateOfBirth",
+          "name"
+        ]
+      },
+      "ApiResponseUserProfileResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/UserProfileResponse"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "UserContactDto": {
+        "type": "object",
+        "properties": {
+          "contactType": {
+            "type": "string",
+            "minLength": 1
+          },
+          "contactValue": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "contactType",
+          "contactValue"
+        ]
+      },
+      "UserProfileResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "bio": {
+            "type": "string"
+          },
+          "photoUrl": {
+            "type": "string"
+          },
+          "dateOfBirth": {
+            "type": "string",
+            "format": "date"
+          },
+          "contacts": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UserContactDto"
+            }
+          }
+        }
+      },
+      "PostRequest": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "minLength": 1
+          },
+          "content": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "content",
+          "title"
+        ]
+      },
+      "ApiResponsePostResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/PostResponse"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "PostResponse": {
+        "type": "object",
+        "properties": {
+          "uuid": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "title": {
+            "type": "string"
+          },
+          "content": {
+            "type": "string"
+          },
+          "authorUuid": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "authorName": {
+            "type": "string"
+          },
+          "authorPhotoUrl": {
+            "type": "string"
+          },
+          "likeCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "commentCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date"
+          },
+          "likedByCurrentUser": {
+            "type": "boolean"
+          }
+        }
+      },
+      "PromocodeDto": {
+        "type": "object",
+        "properties": {
+          "uuid": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "code": {
+            "type": "string",
+            "minLength": 1
+          },
+          "discountPercentage": {
+            "type": "integer",
+            "format": "int32",
+            "maximum": 100,
+            "minimum": 1
+          },
+          "expirationDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "active": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "code",
+          "expirationDate"
+        ]
+      },
+      "ApiResponsePromocodeDto": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/PromocodeDto"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "AddressDto": {
+        "type": "object",
+        "properties": {
+          "uuid": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "street": {
+            "type": "string",
+            "minLength": 1
+          },
+          "city": {
+            "type": "string",
+            "minLength": 1
+          },
+          "state": {
+            "type": "string",
+            "minLength": 1
+          },
+          "zipCode": {
+            "type": "string",
+            "minLength": 1
+          },
+          "default": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "city",
+          "state",
+          "street",
+          "zipCode"
+        ]
+      },
+      "ApiResponseAddressDto": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/AddressDto"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "CommentRequest": {
+        "type": "object",
+        "properties": {
+          "text": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "text"
+        ]
+      },
+      "ApiResponseCommentResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/CommentResponse"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "CommentResponse": {
+        "type": "object",
+        "properties": {
+          "uuid": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "text": {
+            "type": "string"
+          },
+          "authorUuid": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "authorName": {
+            "type": "string"
+          },
+          "authorPhotoUrl": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date"
+          },
+          "replyCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "replies": {
+            "type": "array",
+            "items": {
+
+            }
+          }
+        }
+      },
+      "CategoryDto": {
+        "type": "object",
+        "properties": {
+          "description": {
+            "type": "string",
+            "maxLength": 255,
+            "minLength": 0
+          },
+          "tag": {
+            "type": "string",
+            "maxLength": 50,
+            "minLength": 2
+          }
+        },
+        "required": [
+          "tag"
+        ]
+      },
+      "ApiResponseCategoryDto": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/CategoryDto"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "BookRequest": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "minLength": 1
+          },
+          "description": {
+            "type": "string",
+            "minLength": 1
+          },
+          "edition": {
+            "type": "string"
+          },
+          "numberOfPages": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 1
+          },
+          "price": {
+            "type": "number",
+            "minimum": 0
+          },
+          "language": {
+            "type": "string"
+          },
+          "publishDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "authorIds": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "minItems": 1
+          },
+          "categoryTag": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "minItems": 1
+          }
+        },
+        "required": [
+          "authorIds",
+          "categoryTag",
+          "description",
+          "title"
+        ]
+      },
+      "ApiResponseBookResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/BookResponse"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "BookAuthorResponse": {
+        "type": "object",
+        "properties": {
+          "uuid": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "photoUrl": {
+            "type": "string"
+          }
+        }
+      },
+      "BookResponse": {
+        "type": "object",
+        "properties": {
+          "uuid": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "edition": {
+            "type": "string"
+          },
+          "numberOfPages": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "price": {
+            "type": "number"
+          },
+          "language": {
+            "type": "string"
+          },
+          "publishDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "ebookCoverUrl": {
+            "type": "string"
+          },
+          "authors": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/BookAuthorResponse"
+            }
+          },
+          "categories": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "averageRating": {
+            "type": "number",
+            "format": "double"
+          },
+          "discussionRoomUuid": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
+      "RatingRequest": {
+        "type": "object",
+        "properties": {
+          "score": {
+            "type": "integer",
+            "format": "int32",
+            "maximum": 5,
+            "minimum": 1
+          }
+        }
+      },
+      "ApiResponseRatingResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/RatingResponse"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "RatingResponse": {
+        "type": "object",
+        "properties": {
+          "score": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "ProgressRequest": {
+        "type": "object",
+        "properties": {
+          "currentPage": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "WANT_TO_READ",
+              "READING",
+              "COMPLETED"
+            ]
+          }
+        },
+        "required": [
+          "status"
+        ]
+      },
+      "ApiResponseProgressResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/ProgressResponse"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "ProgressResponse": {
+        "type": "object",
+        "properties": {
+          "currentPage": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalPages": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "percentage": {
+            "type": "number",
+            "format": "double"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "WANT_TO_READ",
+              "READING",
+              "COMPLETED"
+            ]
+          },
+          "lastReadAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "AuthorRequest": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 100,
+            "minLength": 2
+          },
+          "bio": {
+            "type": "string",
+            "minLength": 1
+          },
+          "dateOfBirth": {
+            "type": "string",
+            "format": "date"
+          },
+          "nationality": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "bio",
+          "name"
+        ]
+      },
+      "ApiResponseAuthorResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/AuthorResponse"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "AuthorBooksResponse": {
+        "type": "object",
+        "properties": {
+          "uuid": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "edition": {
+            "type": "string"
+          },
+          "price": {
+            "type": "number"
+          },
+          "ebookCoverUrl": {
+            "type": "string"
+          }
+        }
+      },
+      "AuthorResponse": {
+        "type": "object",
+        "properties": {
+          "uuid": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "bio": {
+            "type": "string"
+          },
+          "dateOfBirth": {
+            "type": "string",
+            "format": "date"
+          },
+          "nationality": {
+            "type": "string"
+          },
+          "photoUrl": {
+            "type": "string"
+          },
+          "followersCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "booksCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "books": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AuthorBooksResponse"
+            }
+          }
+        }
+      },
+      "AdminUserUpdateRequest": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string",
+            "format": "email"
+          },
+          "password": {
+            "type": "string"
+          },
+          "bio": {
+            "type": "string"
+          },
+          "dateOfBirth": {
+            "type": "string",
+            "format": "date"
+          },
+          "photoUrl": {
+            "type": "string"
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "ADMIN",
+              "USER"
+            ]
+          },
+          "enabled": {
+            "type": "boolean"
+          }
+        }
+      },
+      "AdminUserResponse": {
+        "type": "object",
+        "properties": {
+          "uuid": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "bio": {
+            "type": "string"
+          },
+          "photoUrl": {
+            "type": "string"
+          },
+          "dateOfBirth": {
+            "type": "string",
+            "format": "date"
+          },
+          "joinedDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "ADMIN",
+              "USER"
+            ]
+          },
+          "enabled": {
+            "type": "boolean"
+          }
+        }
+      },
+      "ApiResponseAdminUserResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/AdminUserResponse"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "ApiResponseString": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "type": "string"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "ChangePasswordRequest": {
+        "type": "object",
+        "properties": {
+          "currentPassword": {
+            "type": "string",
+            "minLength": 1
+          },
+          "newPassword": {
+            "type": "string",
+            "maxLength": 2147483647,
+            "minLength": 8,
+            "pattern": "^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d]{8,}$"
+          },
+          "confirmationPassword": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "confirmationPassword",
+          "currentPassword",
+          "newPassword"
+        ]
+      },
+      "ApiResponseVoid": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "ApiResponseListUserContactDto": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UserContactDto"
+            }
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "ApiResponseBoolean": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "type": "boolean"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "CheckoutRequestDto": {
+        "type": "object",
+        "properties": {
+          "addressUuid": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "paymentMethod": {
+            "type": "string",
+            "enum": [
+              "COD",
+              "ONLINE"
+            ]
+          },
+          "promocode": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "addressUuid",
+          "paymentMethod"
+        ]
+      },
+      "ApiResponseOrderResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/OrderResponse"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "OrderItemResponse": {
+        "type": "object",
+        "properties": {
+          "uuid": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "bookUuid": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "bookTitle": {
+            "type": "string"
+          },
+          "priceAtPurchase": {
+            "type": "number"
+          }
+        }
+      },
+      "OrderResponse": {
+        "type": "object",
+        "properties": {
+          "uuid": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "userUuid": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "PENDING",
+              "PAID",
+              "SHIPPED",
+              "DELIVERED",
+              "CANCELLED",
+              "FAILED"
+            ]
+          },
+          "paymentMethod": {
+            "type": "string",
+            "enum": [
+              "COD",
+              "ONLINE"
+            ]
+          },
+          "shippingStreet": {
+            "type": "string"
+          },
+          "shippingCity": {
+            "type": "string"
+          },
+          "shippingState": {
+            "type": "string"
+          },
+          "shippingZipCode": {
+            "type": "string"
+          },
+          "totalAmount": {
+            "type": "number"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OrderItemResponse"
+            },
+            "uniqueItems": true
+          }
+        }
+      },
+      "ApiResponseCartResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/CartResponse"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "CartItemResponse": {
+        "type": "object",
+        "properties": {
+          "uuid": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "bookUuid": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "bookTitle": {
+            "type": "string"
+          },
+          "price": {
+            "type": "number"
+          }
+        }
+      },
+      "CartResponse": {
+        "type": "object",
+        "properties": {
+          "uuid": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "userUuid": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CartItemResponse"
+            }
+          },
+          "totalItems": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalAmount": {
+            "type": "number"
+          }
+        }
+      },
+      "ResetPasswordRequest": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email",
+            "minLength": 1
+          },
+          "code": {
+            "type": "string",
+            "minLength": 1
+          },
+          "newPassword": {
+            "type": "string",
+            "maxLength": 2147483647,
+            "minLength": 8,
+            "pattern": "^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d]{8,}$"
+          }
+        },
+        "required": [
+          "code",
+          "email",
+          "newPassword"
+        ]
+      },
+      "RegisterRequest": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 50,
+            "minLength": 3
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "minLength": 1
+          },
+          "password": {
+            "type": "string",
+            "maxLength": 2147483647,
+            "minLength": 8,
+            "pattern": "^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d]{8,}$"
+          }
+        },
+        "required": [
+          "email",
+          "name",
+          "password"
+        ]
+      },
+      "AuthRequest": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email",
+            "minLength": 1
+          },
+          "password": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "email",
+          "password"
+        ]
+      },
+      "AuthResponse": {
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string"
+          }
+        }
+      },
+      "AdminUserRequest": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "minLength": 1
+          },
+          "password": {
+            "type": "string"
+          },
+          "bio": {
+            "type": "string"
+          },
+          "dateOfBirth": {
+            "type": "string",
+            "format": "date"
+          },
+          "photoUrl": {
+            "type": "string"
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "ADMIN",
+              "USER"
+            ]
+          },
+          "enabled": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "email",
+          "name"
+        ]
+      },
+      "ApiResponseListObject": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+
+            }
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "Pageable": {
+        "type": "object",
+        "properties": {
+          "page": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "size": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 1
+          },
+          "sort": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "ApiResponsePagePostResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/PageObject"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "PageObject": {
+        "type": "object",
+        "properties": {
+          "totalPages": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalElements": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "pageable": {
+            "$ref": "#/components/schemas/PageableObject"
+          },
+          "first": {
+            "type": "boolean"
+          },
+          "last": {
+            "type": "boolean"
+          },
+          "size": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "content": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PostResponse"
+            }
+          },
+          "number": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "sort": {
+            "$ref": "#/components/schemas/SortObject"
+          },
+          "numberOfElements": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "empty": {
+            "type": "boolean"
+          }
+        }
+      },
+      "PageableObject": {
+        "type": "object",
+        "properties": {
+          "paged": {
+            "type": "boolean"
+          },
+          "pageNumber": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "pageSize": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "unpaged": {
+            "type": "boolean"
+          },
+          "offset": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "sort": {
+            "$ref": "#/components/schemas/SortObject"
+          }
+        }
+      },
+      "SortObject": {
+        "type": "object",
+        "properties": {
+          "sorted": {
+            "type": "boolean"
+          },
+          "unsorted": {
+            "type": "boolean"
+          },
+          "empty": {
+            "type": "boolean"
+          }
+        }
+      },
+      "ApiResponsePageCommentResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/PageObject"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "ApiResponsePageBookPageAdminResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/PageObject"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "ApiResponseBookAdminResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/BookAdminResponse"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "BookAdminResponse": {
+        "type": "object",
+        "properties": {
+          "uuid": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "edition": {
+            "type": "string"
+          },
+          "numberOfPages": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "price": {
+            "type": "number"
+          },
+          "language": {
+            "type": "string"
+          },
+          "publishDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "authors": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/BookAuthorResponse"
+            }
+          },
+          "categories": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "averageRating": {
+            "type": "number",
+            "format": "double"
+          },
+          "discussionRoomUuid": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "deleted": {
+            "type": "boolean"
+          },
+          "deletedAt": {
+            "type": "string",
+            "format": "date"
+          },
+          "book-cover": {
+            "type": "string"
+          }
+        }
+      },
+      "ApiResponsePageAuthorPageAdminResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/PageObject"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "ApiResponseAuthorAdminResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/AuthorAdminResponse"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "AuthorAdminResponse": {
+        "type": "object",
+        "properties": {
+          "uuid": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "bio": {
+            "type": "string"
+          },
+          "dateOfBirth": {
+            "type": "string",
+            "format": "date"
+          },
+          "nationality": {
+            "type": "string"
+          },
+          "photoUrl": {
+            "type": "string"
+          },
+          "followersCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "booksCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "books": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AuthorBooksResponse"
+            }
+          },
+          "deleted": {
+            "type": "boolean"
+          },
+          "deletedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "ApiResponsePagePromocodeDto": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/PageObject"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "ApiResponsePageOrderResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/PageObject"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "ApiResponseListOrderItemResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OrderItemResponse"
+            }
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "ApiResponseListAddressDto": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AddressDto"
+            }
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "ApiResponseListCategoryDto": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CategoryDto"
+            }
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "ApiResponsePageBookPageResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/PageObject"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "ApiResponseDiscussionRoomResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/DiscussionRoomResponse"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "DiscussionRoomResponse": {
+        "type": "object",
+        "properties": {
+          "uuid": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "bookUuid": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "bookTitle": {
+            "type": "string"
+          },
+          "totalPosts": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "ApiResponsePageAuthorPageResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/PageObject"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "ApiResponsePageAdminUserResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/PageObject"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "description": "JWT Authentication",
+        "in": "header",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  }
+}
